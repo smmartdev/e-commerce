@@ -37,7 +37,7 @@
       <h1>Your Profile</h1>
       <!-- Display current profile image -->
       <div class="profile-image-container">
-        <img id="profileImage" src="/images/users/<%= properties.userId %>.jpg" alt="Profile Image" class="profile-image">
+        <img id="profileImage" src="/images/users/<%= properties.userId||`profileLogo` %>.jpg" alt="Profile Image" class="profile-image">
       </div>
 
     
