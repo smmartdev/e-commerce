@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    <%= product.name %>
+  </title>
+  <link rel="stylesheet" href="/styles/header.css">
+  <link rel="stylesheet" href="/styles/product.css">
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      <a href="/"><img id="logoImage" src="/images/indexLogo.png" alt="Logo"></a>
+    </div>
+    <nav>
+      <ul id="navigatorUl">
+        <li class="navigatorItem"><a href="/">Home</a></li>
+        <li class="navigatorItem"><a href="/products">Products</a></li>
+
+        <li class="navigatorItem"><a href="/contactUs">Contact Us</a></li>
+      </ul>
+    </nav>
+    <div id="loginprofileswapdiv">
+      <% if (properties.isLogged) { %>
+        <!-- Display profile icon if user is logged in -->
+        <a class="loginProflieBt" href="/users/profile/<%= properties.userId %>" title="Profile">
+          <img class="loginProflieimg" src="/images/profileLogo.jpg" alt="Profile">
+        </a>
+        <!-- Display cart icon if user is logged in -->
+        <a class="cartIconBt" href="/cart" title="Cart">
+          <img class="cartIconImg" src="/images/cartLogo.jpg" alt="Cart" id="cartIcon">
+          <div class="cartNotificationBadge" id="cartBadge"></div>
+        </a>
+        <% } else { %>
+          <!-- Display login icon if user is not logged in -->
+          <a class="loginProflieBt" href="/users/login" title="Login">
+            <img class="loginProflieimg" src="/images/loginLogo.jpg" alt="Login">
+          </a>
+          <% } %>
+    </div>
+  </header>
+
+
+
+
+
+
+
+
+
+
+  <main>
+    <!-- Image Carousel -->
+    <div class="carousel">
+      <img id="carouselImage" src="/images/products-images/<%= product._id %>/img1.jpg" alt="<%= product.name %>">
+      <div class="carousel-controls">
+        <button class="carousel-button" onclick="prevImage()">&#10094;</button>
+        <button class="carousel-button" onclick="nextImage()">&#10095;</button>
+      </div>
+    </div>
+
+    <h1>
+      <%= product.name %>
+    </h1>
+    <p>
+      <%= product.description %>
+    </p>
+    <p>Price: $<%= product.price %>
+    </p>
+    <form action="/cart/add/<%= product._id %>" method="POST">
+      <label for="quantity">Quantity:</label>
+      <input type="number" id="quantity" name="quantity" min="1" required>
+      <button type="submit">Add to Cart</button>
+    </form>
+  </main>
+  <%- include('../partials/footer') %>
+
+    <script>
+      // JavaScript for the carousel functionality
+      const images = [
+        `/images/products-images/<%= product._id %>/img1.jpg`,
+        `/images/products-images/<%= product._id %>/img2.jpg` || `/images/products-images/<%= product._id %>/img1.jpg`,
+        `/images/products-images/<%= product._id %>/img3.jpg` || `/images/products-images/<%= product._id %>/img1.jpg`
+
+      ];
+      console.log({ images });
+
+
+      let currentIndex = 0;
+
+
+      function updateImage(index) {
+        console.log('updateImage called');
+
+        const carouselImage = document.getElementById('carouselImage');
+
+        carouselImage.src = images[index];
+      }
+
+      function prevImage() {
+        currentIndex = (currentIndex > 0) ? currentIndex - 1 : images.length - 1;
+        updateImage(currentIndex);
+      }
+
+      function nextImage() {
+        currentIndex = (currentIndex < images.length - 1) ? currentIndex + 1 : 0;
+        updateImage(currentIndex);
+      }
+    </script>
+</body>
+
+</html>

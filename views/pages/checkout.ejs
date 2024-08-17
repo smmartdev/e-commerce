@@ -1,0 +1,46 @@
+<!-- views/pages/checkout.ejs -->
+
+<%- include('../partials/header') %>
+
+<main>
+  <h1>Checkout</h1>
+  <form id="payment-form">
+    <div>
+      <label for="shippingAddress">Shipping Address:</label>
+      <input type="text" id="shippingAddress" name="shippingAddress" required>
+    </div>
+    <button type="submit">Pay Now</button>
+  </form>
+
+  <script src="https://js.stripe.com/v3/"></script>
+  <script>
+    const stripe = Stripe('your_stripe_publishable_key'); // Replace with your Stripe publishable key
+
+    const form = document.getElementById('payment-form');
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const response = await fetch('/payment/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cartItems: [{ product: { name: 'Sample Product', price: 2000 }, quantity: 1 }], // Replace with actual cart items
+          totalAmount: 2000,
+          shippingAddress: document.getElementById('shippingAddress').value,
+        }),
+      });
+
+      const { id } = await response.json();
+
+      const { error } = await stripe.redirectToCheckout({ sessionId: id });
+
+      if (error) {
+        console.error('Error:', error);
+      }
+    });
+  </script>
+</main>
+
+<%- include('../partials/footer') %>

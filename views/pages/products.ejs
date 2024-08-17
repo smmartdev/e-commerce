@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Our Store</title>
+  <link rel="stylesheet" href="/styles/header.css">
+  <link rel="stylesheet" href="/styles/index.css">
+  <link rel="stylesheet" href="/styles/products.css">
+
+  <style>
+    .cartNotificationBadge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: red;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+      visibility: hidden;
+    }
+
+    .cartIconBt {
+      position: relative;
+    }
+
+    .product-list {
+      margin-top: 20px;
+    }
+
+    .product {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+
+    .product img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .product h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .product p {
+      margin: 5px 0;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 8px 12px;
+      margin: 5px;
+      border-radius: 4px;
+      text-decoration: none;
+      color: #fff;
+      background-color: #007bff;
+    }
+
+    .button.add-to-cart {
+      background-color: #28a745;
+    }
+
+    .button.details {
+      background-color: #17a2b8;
+    }
+
+    label {
+      margin-right: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      <a href="/"><img id="logoImage" src="images/indexLogo.png" alt="Logo"></a>
+    </div>
+    <nav>
+      <ul id="navigatorUl">
+        <li class="navigatorItem"><a href="/">Home</a></li>
+        <li class="navigatorItem"><a href="/products">Products</a></li>
+        <% if (properties.isAdmin) { %>
+          <li class="navigatorItem"><a href="/users">Users</a></li>
+          <% } %>
+        <li class="navigatorItem"><a href="/contactUs">Contact Us</a></li>
+      </ul>
+    </nav>
+    <div id="loginprofileswapdiv">
+      <% if (properties.isLogged) { %>
+        <!-- Display profile icon if user is logged in -->
+        <a class="loginProflieBt" href="/users/profile/<%= properties.userId %>" title="Profile">
+          <img class="loginProflieimg" src="./images/users/<%= properties.userId %>.jpg" alt="Profile">
+        </a>
+        <!-- Display cart icon if user is logged in -->
+        <a class="cartIconBt" href="/cart" title="Cart">
+          <img class="cartIconImg" src="./images/cartLogo.jpg" alt="Cart" id="cartIcon">
+          <div class="cartNotificationBadge" id="cartBadge">!</div>
+        </a>
+        <% } else { %>
+          <!-- Display login icon if user is not logged in -->
+          <a class="loginProflieBt" href="/users/login" title="Login">
+            <img class="loginProflieimg" src="./images/loginLogo.jpg" alt="Login">
+          </a>
+          <% } %>
+    </div>
+  </header>
+
+  <main>
+    <h1>Welcome to Our Store</h1>
+    <section>
+      <label for="categoryFilter">Category:</label>
+      <select id="categoryFilter">
+        <option value="all">All Categories</option>
+        <!-- Add categories dynamically or hardcode them -->
+        <option value="Electronics">Electronics</option>
+        <option value="Accessories">Accessories</option>
+        <option value="Home Appliances">Home Appliances</option>
+
+      </select>
+
+      <label for="priceSort">Sort by Price:</label>
+      <select id="priceSort">
+        <option value="asc">Low to High</option>
+        <option value="desc">High to Low</option>
+      </select>
+
+      <div class="product-list" id="productList">
+        <% products.forEach(product=> { %>
+          <div class="product" data-category="<%= product.category %>" id="product-<%= product._id %>">
+            <img src="images/products-images/<%= product._id %>/img1.jpg" alt="<%= product.name %>"
+              class="product-image">
+            <h3><a href="/products/<%= product._id %>">
+                <%= product.name %>
+              </a></h3>
+            <p>
+              <%= product.description %>
+            </p>
+            <p class="price">Price: $<%= product.price %>
+            </p>
+            <div class="buttons">
+              <a href="/products/<%= product._id %>" class="button details">Details</a>
+              <button class="button add-to-cart" data-product-id="<%= product._id %>">Add to Cart</button>
+            </div>
+          </div>
+          <% }) %>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const categoryFilter = document.getElementById('categoryFilter');
+      const priceSort = document.getElementById('priceSort');
+      const productList = document.getElementById('productList');
+      const cartBadge = document.getElementById('cartBadge');
+      let initialCartCount = 0; // Replace with actual initial count if available
+
+      function filterProducts() {
+        const selectedCategory = categoryFilter.value;
+        const products = productList.querySelectorAll('.product');
+        console.log('products:', typeof products);
+
+        products.forEach(product => {
+          const category = product.getAttribute('data-category');
+          product.style.display = selectedCategory === 'all' || category === selectedCategory ? 'block' : 'none';
+        });
+      }
+
+      function sortProducts() {
+        console.log('sortProducts called');
+        const order = priceSort.value;
+        // console.log(order);
+
+        const products = Array.from(productList.querySelectorAll('.product'));
+        console.log('array products', typeof products);
+
+        products.sort((a, b) => {
+          const priceA = parseFloat(a.querySelector('.price').textContent.replace('Price: $', ''));
+          const priceB = parseFloat(b.querySelector('.price').textContent.replace('Price: $', ''));
+          return order === 'asc' ? priceA - priceB : priceB - priceA;
+        });
+        products.forEach(product => productList.appendChild(product));
+      }
+
+      categoryFilter.addEventListener('change', () => {
+        filterProducts();
+        sortProducts();
+      });
+
+      priceSort.addEventListener('change', () => {
+        sortProducts();
+      });
+
+      document.querySelectorAll('.add-to-cart').forEach(button => {
+        button.addEventListener('click', async () => {
+          console.log('Add to cart button clicked');
+          const productId = button.getAttribute('data-product-id');
+
+          if (<%= properties.isLogged %>) {
+          try {
+            const response = await fetch(`/cart/add/${productId}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              }
+            });
+
+            if (response.ok) {
+              // Update cart badge
+              let count = parseInt(cartBadge.textContent) || initialCartCount;
+              count += 1;
+              updateCartBadge(count);
+              initialCartCount = count; // Update the initial count for further additions
+            } else {
+              alert('Failed to add product to cart.');
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while adding the product to the cart.');
+          }
+        } else {
+          // Redirect to login page with the current URL as a query parameter
+          window.location.href = `/users/login?redirectUrl=${window.location.href}`;
+        }
+
+      });
+    });
+
+    function updateCartBadge(count) {
+      if (count > 0) {
+        cartBadge.textContent = count;
+        cartBadge.style.visibility = 'visible';
+      }
+    }
+    });
+  </script>
+
+</body>
+
+</html>

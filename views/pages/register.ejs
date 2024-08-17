@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Our Store</title>
+  <link rel="stylesheet" href="/styles/header.css">
+  <link rel="stylesheet" href="/styles/register.css">
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      <a href="/"><img id="logoImage" src="images/indexLogo.png" alt="Logo"></a> <!-- Replace with your logo path -->
+    </div>
+    <nav>
+      <ul id="navigatorUl">
+        <li class="navigatorItem"><a href="/">Home</a></li>
+        <li class="navigatorItem"><a href="/products">Products</a></li>
+       
+        <li class="navigatorItem"><a href="/contactUs">Contact Us</a></li>
+      </ul>
+    </nav>
+    <div id="loginprofileswapdiv">
+      <% if (properties.isLogged) { %>
+        <!-- Display profile icon if user is logged in -->
+        <a class="loginProflieBt" href="/users/profile/<%= userId %>" title="Profile"><img class="loginProflieimg"
+            src="images/profileLogo.jpg" alt="" srcset=""></a>
+        <% } else { %>
+          <!-- Display login icon if user is not logged in -->
+          <a class="loginProflieBt" href="/users/login" title="Login"><img class="loginProflieimg"
+              src="images/loginLogo.jpg" alt="" srcset=""></a>
+          <% } %>
+    </div>
+  </header>
+  <div class="container">
+    <h2>Register</h2>
+    <form action="/users/register" method="POST">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+      <p id="email-status" class="email-status"></p>
+
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+
+      <label for="address">Address:</label>
+      <input type="text" id="address" name="address" required>
+
+      <button type="submit">Register</button>
+    </form>
+    <p>Already have an account? <a href="/users/login">Login here</a></p>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const emailInput = document.getElementById('email');
+      const emailStatus = document.getElementById('email-status');
+
+      emailInput.addEventListener('blur', async () => {
+        const email = emailInput.value;
+
+        if (email) {
+          try {
+            const response = await fetch(`/users/checkEmailAvailability?email=${encodeURIComponent(email)}`);
+            const isAvailable = await response.json();
+
+            if (isAvailable) {
+              emailStatus.textContent = 'Email is available';
+              emailStatus.className = 'email-status available';
+            } else {
+              emailStatus.textContent = 'Email is already in use';
+              emailStatus.className = 'email-status unavailable';
+            }
+          } catch (error) {
+            console.error('Error checking email:', error);
+            emailStatus.textContent = 'Error checking email';
+            emailStatus.className = 'email-status unavailable';
+          }
+        } else {
+          emailStatus.textContent = '';
+          emailStatus.className = 'email-status';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

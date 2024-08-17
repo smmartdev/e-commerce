@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Our Store</title>
+  <link rel="stylesheet" href="/styles/header.css">
+  <link rel="stylesheet" href="/styles/profile.css">
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="/"><img id="logoImage" src="/images/indexLogo.png" alt="Logo"></a>
+    </div>
+    <nav>
+      <ul id="navigatorUl">
+        <li class="navigatorItem"><a href="/">Home</a></li>
+        <li class="navigatorItem"><a href="/products">Products</a></li>
+       
+        <li class="navigatorItem"><a href="/contactUs">Contact Us</a></li>
+      </ul>
+    </nav>
+    <div id="loginprofileswapdiv">
+      <% if (properties.isLogged) { %>
+        <a class="loginProflieBt" href="/users/profile/<%= properties.userId %>" title="Profile">
+          <img class="loginProflieimg" src="/images/users/<%= properties.userId %>.jpg" alt="" srcset=""></a>
+        <% } else { %>
+          <a class="loginProflieBt" href="/users/login" title="Login"><img class="loginProflieimg"
+            src="/images/loginLogo.jpg" alt="" srcset=""></a>
+          <% } %>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <h1>Your Profile</h1>
+      <!-- Display current profile image -->
+      <div class="profile-image-container">
+        <img id="profileImage" src="/images/users/<%= properties.userId %>.jpg" alt="Profile Image" class="profile-image">
+      </div>
+
+    
+
+      <!-- Form to edit profile and upload a new image -->
+      <div class="edit-profile-form">
+        <form action="/users/profile/update" method="POST" enctype="multipart/form-data">
+          <label for="name">Name:</label>
+          <input type="text" id="name" name="name" value="<%= user.name %>" required>
+
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" value="<%= user.email %>" required>
+
+          <label for="address">Address:</label>
+          <input type="text" id="address" name="address" value="<%= user.address %>" required>
+
+          <label for="profileImage">Profile Image:</label>
+          <input type="file" id="editProfileImage" name="profileImage" accept="image/*">
+
+          <input type="hidden" id="userId" name="userId" value="<%= user._id %>" required>
+
+          <button type="submit">Update Profile</button>
+        </form>
+      </div>
+
+      <a href="/users/logout">Logout</a>
+    </div>
+  </main>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

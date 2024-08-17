@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Cart</title>
+  <link rel="stylesheet" href="/styles/header.css">
+  <link rel="stylesheet" href="/styles/cart.css">
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      <a href="/"><img id="logoImage" src="/images/indexLogo.png" alt="Logo"></a>
+    </div>
+    <nav>
+      <ul id="navigatorUl">
+        <li class="navigatorItem"><a href="/">Home</a></li>
+        <li class="navigatorItem"><a href="/products">Products</a></li>
+       
+        <li class="navigatorItem"><a href="/contactUs">Contact Us</a></li>
+      </ul>
+    </nav>
+    <div id="loginprofileswapdiv">
+      <% if (properties.isLogged) { %>
+        <!-- Display profile icon if user is logged in -->
+        <a class="loginProflieBt" href="/users/profile/<%= properties.userId %>" title="Profile">
+          <img class="loginProflieimg" src="/images/profileLogo.jpg" alt="Profile">
+        </a>
+        <% } else { %>
+          <!-- Display login icon if user is not logged in -->
+          <a class="loginProflieBt" href="/users/login" title="Login">
+            <img class="loginProflieimg" src="/images/loginLogo.jpg" alt="Login">
+          </a>
+          <% } %>
+    </div>
+  </header>
+
+  <main>
+    <h1>Your Cart</h1>
+    <div class="cart-items">
+      <% if (cart.items.length> 0) { %>
+        <% cart.items.forEach(item=> { %>
+          <div class="cart-item">
+            <img class="cartProductImage" src="/images/products-images/<%= item.product._id %>/img1.jpg" alt="<%= item.product.name %>"
+              class="cart-item-image">
+
+
+            <h3 class="productNameHeader">
+              <%= item.product.name %>
+            </h3>
+            <p class="quantityP">Quantity: <%= item.quantity %>
+            </p>
+            <p class="priceP">Price: $<%= item.price %>
+            </p>
+            <form action="/cart/remove" method="POST">
+              <input hidden name="itemId" value="<%= item._id %>">
+              <input hidden name="userId" value="<%= properties.userId %>">
+
+              
+              </h3>
+              <button type="submit">Remove</button>
+            </form>
+          </div>
+          <% }) %>
+            <div class="cart-total">
+              <h3>Total Price: $<%= cart.totalPrice %>
+              </h3>
+            </div>
+            <% } else { %>
+              <p>Your cart is empty.</p>
+              <% } %>
+    </div>
+    <!-- Optionally add a checkout button -->
+    <a href="/checkout" class="checkout-button">Proceed to Checkout</a>
+  </main>
+</body>
+
+</html>

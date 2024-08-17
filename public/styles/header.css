@@ -1,0 +1,77 @@
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    margin-left: 60px;
+  }
+
+  .logo img {
+    height: 40px;
+    /* Adjust the size of the logo */
+    vertical-align: middle;
+  }
+
+  nav {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  #navigatorUl {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: space-around;
+    flex-grow: 1;
+  }
+
+  .navigatorItem {
+    margin: 0;
+  }
+
+  .navigatorItem a {
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 20px;
+    display: block;
+    font-size: 16px;
+  }
+
+  .navigatorItem a:hover {
+    background-color: #555;
+    border-radius: 4px;
+  }
+
+  #logoImage {
+    width: 40px ;
+    height: 40px;
+    border-radius: 20px ;
+
+  }
+
+
+  #loginprofileswapdiv {
+    width: fit-content;
+    height: fit-content;
+    border-radius: 20px;
+    margin-right: 60px;
+  }
+  
+  .loginProflieimg {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+  }
+  .cartIconImg{
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+  }
+  
