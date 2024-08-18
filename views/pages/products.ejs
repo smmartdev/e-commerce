@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="/styles/products.css">
 
   <style>
+    /* Existing CSS rules */
     .cartNotificationBadge {
       position: absolute;
       top: -5px;
@@ -75,6 +76,10 @@
       background-color: #17a2b8;
     }
 
+    .button.delete {
+      background-color: #dc3545;
+    }
+
     label {
       margin-right: 10px;
     }
@@ -82,39 +87,7 @@
 </head>
 
 <body>
-  <header>
-    <div class="logo">
-      <a href="/"><img id="logoImage" src="images/indexLogo.png" alt="Logo"></a>
-    </div>
-    <nav>
-      <ul id="navigatorUl">
-        <li class="navigatorItem"><a href="/">Home</a></li>
-        <li class="navigatorItem"><a href="/products">Products</a></li>
-        <% if (properties.isAdmin) { %>
-          <li class="navigatorItem"><a href="/users">Users</a></li>
-          <% } %>
-        <li class="navigatorItem"><a href="/contactUs">Contact Us</a></li>
-      </ul>
-    </nav>
-    <div id="loginprofileswapdiv">
-      <% if (properties.isLogged) { %>
-        <!-- Display profile icon if user is logged in -->
-        <a class="loginProflieBt" href="/users/profile/<%= properties.userId %>" title="Profile">
-          <img class="loginProflieimg" src="./images/users/<%= properties.userId %>.jpg" alt="Profile">
-        </a>
-        <!-- Display cart icon if user is logged in -->
-        <a class="cartIconBt" href="/cart" title="Cart">
-          <img class="cartIconImg" src="./images/cartLogo.jpg" alt="Cart" id="cartIcon">
-          <div class="cartNotificationBadge" id="cartBadge">!</div>
-        </a>
-        <% } else { %>
-          <!-- Display login icon if user is not logged in -->
-          <a class="loginProflieBt" href="/users/login" title="Login">
-            <img class="loginProflieimg" src="./images/loginLogo.jpg" alt="Login">
-          </a>
-          <% } %>
-    </div>
-  </header>
+  <%- include('../partials/header') %>
 
   <main>
     <h1>Welcome to Our Store</h1>
@@ -126,7 +99,6 @@
         <option value="Electronics">Electronics</option>
         <option value="Accessories">Accessories</option>
         <option value="Home Appliances">Home Appliances</option>
-
       </select>
 
       <label for="priceSort">Sort by Price:</label>
@@ -136,24 +108,38 @@
       </select>
 
       <div class="product-list" id="productList">
-        <% products.forEach(product=> { %>
-          <div class="product" data-category="<%= product.category %>" id="product-<%= product._id %>">
-            <img src="images/products-images/<%= product._id %>/img1.jpg" alt="<%= product.name %>"
-              class="product-image">
-            <h3><a href="/products/<%= product._id %>">
-                <%= product.name %>
-              </a></h3>
-            <p>
-              <%= product.description %>
-            </p>
-            <p class="price">Price: $<%= product.price %>
-            </p>
-            <div class="buttons">
-              <a href="/products/<%= product._id %>" class="button details">Details</a>
-              <button class="button add-to-cart" data-product-id="<%= product._id %>">Add to Cart</button>
+        <% products.forEach(product => { %>
+          <% if (properties.isSeller) { %>
+            <% if (product.sellerName === properties.userName) { %>
+              <div class="product" data-category="<%= product.category %>" id="product-<%= product._id %>">
+                <img src="images/products-images/<%= product._id %>/img1.jpg" alt="<%= product.name %>" class="product-image">
+                <h3><a href="/products/<%= product._id %>">
+                    <%= product.name %>
+                  </a></h3>
+                <p><%= product.description %></p>
+                <p class="price">Price: $<%= product.price %></p>
+                <div class="buttons">
+                  <a href="/products/<%= product._id %>" class="button details">Details</a>
+                  <button class="button delete" data-product-id="<%= product._id %>">Delete</button>
+                </div>
+              </div>
+            <% } %>
+          <% } else { %>
+
+            <div class="product" data-category="<%= product.category %>" id="product-<%= product._id %>">
+              <img src="images/products-images/<%= product._id %>/img1.jpg" alt="<%= product.name %>" class="product-image">
+              <h3><a href="/products/<%= product._id %>">
+                  <%= product.name %>
+                </a></h3>
+              <p><%= product.description %></p>
+              <p class="price">Price: $<%= product.price %></p>
+              <div class="buttons">
+                <a href="/products/<%= product._id %>" class="button details">Details</a>
+                <button class="button add-to-cart" data-product-id="<%= product._id %>">Add to Cart</button>
+              </div>
             </div>
-          </div>
-          <% }) %>
+          <% } %>
+        <% }) %>
       </div>
     </section>
   </main>
@@ -169,7 +155,6 @@
       function filterProducts() {
         const selectedCategory = categoryFilter.value;
         const products = productList.querySelectorAll('.product');
-        console.log('products:', typeof products);
 
         products.forEach(product => {
           const category = product.getAttribute('data-category');
@@ -178,18 +163,15 @@
       }
 
       function sortProducts() {
-        console.log('sortProducts called');
         const order = priceSort.value;
-        // console.log(order);
-
         const products = Array.from(productList.querySelectorAll('.product'));
-        console.log('array products', typeof products);
 
         products.sort((a, b) => {
           const priceA = parseFloat(a.querySelector('.price').textContent.replace('Price: $', ''));
           const priceB = parseFloat(b.querySelector('.price').textContent.replace('Price: $', ''));
           return order === 'asc' ? priceA - priceB : priceB - priceA;
         });
+
         products.forEach(product => productList.appendChild(product));
       }
 
@@ -204,48 +186,72 @@
 
       document.querySelectorAll('.add-to-cart').forEach(button => {
         button.addEventListener('click', async () => {
-          console.log('Add to cart button clicked');
           const productId = button.getAttribute('data-product-id');
 
           if (<%= properties.isLogged %>) {
-          try {
-            const response = await fetch(`/cart/add/${productId}`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
+            try {
+              const response = await fetch(`/cart/add/${productId}`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                }
+              });
+
+              if (response.ok) {
+                // Update cart badge
+                let count = parseInt(cartBadge.textContent) || initialCartCount;
+                count += 1;
+                updateCartBadge(count);
+                initialCartCount = count; // Update the initial count for further additions
+              } else {
+                alert('Failed to add product to cart.');
               }
-            });
-
-            if (response.ok) {
-              // Update cart badge
-              let count = parseInt(cartBadge.textContent) || initialCartCount;
-              count += 1;
-              updateCartBadge(count);
-              initialCartCount = count; // Update the initial count for further additions
-            } else {
-              alert('Failed to add product to cart.');
+            } catch (error) {
+              console.error('Error:', error);
+              alert('An error occurred while adding the product to the cart.');
             }
-          } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred while adding the product to the cart.');
+          } else {
+            // Redirect to login page with the current URL as a query parameter
+            window.location.href = `/users/login?redirectUrl=${window.location.href}`;
           }
-        } else {
-          // Redirect to login page with the current URL as a query parameter
-          window.location.href = `/users/login?redirectUrl=${window.location.href}`;
-        }
-
+        });
       });
-    });
 
-    function updateCartBadge(count) {
-      if (count > 0) {
-        cartBadge.textContent = count;
-        cartBadge.style.visibility = 'visible';
+      document.querySelectorAll('.delete').forEach(button => {
+        button.addEventListener('click', async () => {
+          const productId = button.getAttribute('data-product-id');
+          if (confirm('Are you sure you want to delete this product?')) {
+            try {
+              console.log(productId);
+              
+              const response = await fetch(`/products/delete/${productId}`, {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                }
+              });
+
+              if (response.ok) {
+                document.getElementById(`product-${productId}`).remove();
+              } else {
+                alert('Failed to delete the product.');
+              }
+            } catch (error) {
+              console.error('Error:', error);
+              alert('An error occurred while deleting the product.');
+            }
+          }
+        });
+      });
+
+      function updateCartBadge(count) {
+        if (count > 0) {
+          cartBadge.textContent = count;
+          cartBadge.style.visibility = 'visible';
+        }
       }
-    }
     });
   </script>
-
 </body>
 
 </html>

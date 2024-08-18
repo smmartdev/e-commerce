@@ -1,7 +1,17 @@
 // app.js
 const express = require('express');
 const app = express();
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+// Middleware to parse JSON bodies
+// app.use(bodyParser.json());
+// Middleware to parse URL-encoded bodies
+// app.use(bodyParser.urlencoded({ extended: true }));
 const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+
+
 const connectDB = require('./config/mongoose');
 const userRoutes = require('./routes/userRoutes');
 const productRoutes = require('./routes/productRoutes');
@@ -24,11 +34,13 @@ connectDB();
 // Set EJS as the view engine
 app.set('view engine', 'ejs');
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
+
+
+
 
 // Routes
 app.use(isLogged);
@@ -44,7 +56,7 @@ app.use('/cart', cartRoutes);
 // Serve home page
 app.get('/', async (req, res) => {
   console.log('home page called');
-  
+
   try {
     const products = await Product.find();
     const properties = req.properties;

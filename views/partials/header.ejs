@@ -1,16 +1,38 @@
-<style>
-  /* Inline styles for the navigation bar */
-
-</style>
 <header>
   <div class="logo">
-    <a href="/"><img id="logoImage" src="./images/indexLogo.png" alt="Logo"></a> <!-- Replace with your logo path -->
+    <a href="/"><img id="logoImage" src="images/indexLogo.png" alt="Logo"></a>
   </div>
   <nav>
     <ul id="navigatorUl">
       <li class="navigatorItem"><a href="/">Home</a></li>
       <li class="navigatorItem"><a href="/products">Products</a></li>
-      <li class="navigatorItem"><a href="/cart">Cart</a></li>
-      <li class="navigatorItem"><a href="/contactUs">Contact Us</a></li>
+      <% if (properties.isAdmin) { %>
+        <li class="navigatorItem"><a href="/users">Users</a></li>
+        <% } if (properties.isSeller) { %>
+          <li class="navigatorItem"><a href="/products/add">Add Products</a></li>
+          <% } %>
+            <li class="navigatorItem"><a href="/contactUs">Contact Us</a></li>
     </ul>
   </nav>
+  <div id="loginprofileswapdiv">
+    <% if (properties.isLogged) { %>
+      <!-- Display profile icon if user is logged in -->
+      <a class="loginProflieBt" href="/users/profile/<%= properties.userId %>" title="Profile">
+        <img class="loginProflieimg" src="images/users/<%= properties.userId %>.jpg" alt="Profile"
+          onerror="this.onerror=null; this.src='images/users/profileLogo.jpg';">
+        <!-- <img class="loginProflieimg" src="./images/profileLogo.jpg" alt="Profile"> -->
+
+      </a>
+      <!-- Display cart icon if user is logged in -->
+      <a class="cartIconBt" href="/cart" title="Cart">
+        <img class="cartIconImg" src="./images/cartLogo.jpg" alt="Cart" id="cartIcon">
+        <div class="cartNotificationBadge" id="cartBadge"></div>
+      </a>
+      <% } else { %>
+        <!-- Display login icon if user is not logged in -->
+        <a class="loginProflieBt" href="/users/login" title="Login">
+          <img class="loginProflieimg" src="./images/loginLogo.jpg" alt="Login">
+        </a>
+        <% } %>
+  </div>
+</header>

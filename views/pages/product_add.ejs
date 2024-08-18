@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Product</title>
+  <link rel="stylesheet" href="/styles/header.css">
+  <link rel="stylesheet" href="/styles/product.css">
+  <style>
+    /* Optional: Add some styles for image previews */
+    .image-preview-container {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .image-preview {
+      max-width: 150px;
+      max-height: 150px;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <%- include('../partials/header') %>
+
+    <main>
+      <h1>Add Product</h1>
+      <!-- <form action="/products/add" method="POST"> -->
+      <form action="/products/add" method="POST" enctype="multipart/form-data">
+
+        <label for="name">Product Name:</label>
+        <input type="text" id="name" name="name" required>
+        <br>
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea>
+        <br>
+        <label for="price">Price:</label>
+        <input type="number" id="price" name="price" step="0.01" min="0" required>
+        <br>
+        <label for="category">Category:</label>
+        <select id="category" name="category" required>
+          <option value="">Select a category</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Accessories">Accessories</option>
+          <option value="Home Appliances">Home Appliances</option>
+        </select>
+        <br>
+        <label for="images">Product Images (Select up to 3 images):</label>
+
+        <input type="file" id="images" name="images" accept="image/*" multiple required>
+        <br>
+        <!-- Image preview elements -->
+        <div class="image-preview-container">
+          <img class="image-preview" id="imagePreview1" alt="Image Preview 1">
+          <img class="image-preview" id="imagePreview2" alt="Image Preview 2">
+          <img class="image-preview" id="imagePreview3" alt="Image Preview 3">
+        </div>
+        <br>
+        <button type="submit">Add Product</button>
+      </form>
+    </main>
+
+    <%- include('../partials/footer') %>
+
+      <script>
+        document.getElementById('images').addEventListener('change', function (event) {
+          const files = event.target.files;
+          const previews = document.querySelectorAll('.image-preview');
+
+          // Hide all previews initially
+          previews.forEach(preview => preview.style.display = 'none');
+
+          // Display up to 3 image previews
+          for (let i = 0; i < Math.min(files.length, 3); i++) {
+            const file = files[i];
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              previews[i].src = e.target.result;
+              previews[i].style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      </script>
+
+</body>
+
+</html>

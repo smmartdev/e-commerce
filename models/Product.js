@@ -18,18 +18,13 @@ const ProductSchema = new Schema({
   category: {
     type: String
   },
-  stock: {
-    type: Number,
+  sellerId: {
+    type: String,
     required: true
   },
-  image: {
-    type: String // URL or path to product image
-  },
-  image2: {
-    type: String // URL or path to product image
-  },
-  image3: {
-    type: String // URL or path to product image
+  sellerName: {
+    type: String,
+    required: true
   }
 }, { timestamps: true });
 

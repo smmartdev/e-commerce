@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,33 +10,17 @@
 </head>
 
 <body>
-  <header>
-    <div class="logo">
-      <a href="/"><img id="logoImage" src="/images/indexLogo.png" alt="Logo"></a> <!-- Replace with your logo path -->
-    </div>
-    <nav>
-      <ul id="navigatorUl">
-        <li class="navigatorItem"><a href="/">Home</a></li>
-        <li class="navigatorItem"><a href="/products">Products</a></li>
-       
-        <li class="navigatorItem"><a href="/contactUs">Contact Us</a></li>
-      </ul>
-    </nav>
-    <div id="loginprofileswapdiv">
-      <% if (properties.isLogged) { %>
-        <!-- Display profile icon if user is logged in -->
-        <a class="loginProflieBt" href="/users/profile/<%= properties.userId %>" title="Profile"><img class="loginProflieimg"
-            src="/images/profileLogo.jpg" alt="" srcset=""></a>
-        <% } else { %>
-          <!-- Display login icon if user is not logged in -->
-          <a class="loginProflieBt" href="/users/login" title="Login"><img class="loginProflieimg"
-              src="/images/loginLogo.jpg" alt="" srcset=""></a>
-          <% } %>
-    </div>
-  </header>
+
   <div class="container">
     <h2>Login</h2>
-    <form action="/users/login?redirectUrl=<%= redirectUrl %>" method="POST">
+    <% 
+    // Set a default value if redirectUrl is not defined
+    const resolvedRedirectUrl = typeof redirectUrl !== 'undefined' ? redirectUrl : '/users/profile';
+  %>
+    <form action="/users/login?redirectUrl=<%= resolvedRedirectUrl %>" method="POST">
+
+
+
       <label for="email">Email:</label>
       <input type="email" id="email" name="email" required>
 
@@ -46,9 +31,13 @@
     </form>
     <p>Don't have an account? <a href="/users/register">Register here</a></p>
     <!-- Error message -->
-    <% if (loginError) { %>
+    <% 
+    const loginError_ = typeof loginError !== 'undefined' ? loginError : false;
+  %>
+    <% if(loginError_){%>
       <p class="error-message show">Wrong username or password</p>
       <% } %>
   </div>
 </body>
+
 </html>

@@ -1,27 +1,44 @@
-// config/multerConfig.js
-
-const path = require('path');
-const fs = require('fs');
 const multer = require('multer');
+const path = require('path');
 
-// Setup multer storage configuration
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    console.log('multer.diskStorage called');
-
-    const uploadPath = path.join(__dirname, '../public/images/users'); // Set your upload path
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
+// Factory function to create multer middleware with dynamic storage and field handling
+const multerMiddleware = () => {
+  console.log('multerMiddleware called');
+  let filesList = [];
+  const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      console.log('destination called');
+      console.log('req.productId: ', req.destinationPath)
+      cb(null, req.destinationPath);
+    },
+    filename: (req, file, cb) => {
+      console.log('filename called');
+      const counter = req.fileCounter || 1; // Default to 1 if not set
+      const filename = `img${counter}${path.extname(file.originalname)}`;
+      req.fileCounter = counter + 1
+      filesList.push(filename)
+      cb(null, filename);
     }
-    cb(null, uploadPath);
-  },
-  filename: (req, file, cb) => {
-    const userId = req.user.id;
-    cb(null, `${userId}.jpg`); // Save file as userId.jpg
-  }
-});
+  });
 
-// Create multer instance
-const upload = multer({ storage });
+  // Create multer instance
+  const upload = multer({ storage });
+  return (req, res, next) => {
+    const maxCount = req.maxCount;
+    const imageFields = req.imageFields;
 
-module.exports = upload;
+
+    upload.array(imageFields, maxCount)(req, res, (err) => {
+      if (err) {
+        req.uploadResult = false;
+        return next(err); // Handle multer errors
+      }
+      // Proceed with your business logic
+      req.uploadResult = true;
+      req.fileList = filesList
+      next();
+    });
+  };
+};
+
+module.exports = multerMiddleware;

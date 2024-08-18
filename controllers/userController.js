@@ -3,6 +3,8 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const createMulter = require('../config/multer'); // Import the dynamic multer configuration
+
 
 exports.showRegisterForm = (req, res) => {
   console.log('showRegisterForm called');
@@ -39,35 +41,43 @@ exports.register = async (req, res) => {
 };
 
 
-exports.updateProfile = async (req, res) => {
-  console.log('updateProfile called');
-  try {
-    const properties = req.properties;
+exports.updateProfile = (req, res) => {
+  // Create a multer instance for profile images
+  const multer = createMulter('users'); // Use 'users' path for profile images
 
-    const { name, email, address, userId } = req.body;
+  // Use multer middleware to handle file uploads
+  multer.single('image')(req, res, async (err) => {
+    if (err) {
+      return res.render('pages/404', { error: err });
+    }
 
-    // Handle file upload
-    // multer middleware will handle file upload and saving, no need to handle file here
+    console.log('updateProfile called');
+    try {
+      const properties = req.properties;
 
-    if (properties.isLogged) {
-      const profileImagePath = req.file ? `/images/users/${userId}.jpg` : undefined; // Path to the uploaded image
+      const { name, email, address, userId } = req.body;
 
+      // Path to the uploaded image
+      const profileImagePath = req.file ? `/images/users/${userId}.jpg` : undefined;
+
+      // Prepare updated fields
       const updatedFields = { name, email, address };
       if (profileImagePath) {
         updatedFields.profileImage = profileImagePath; // Update with new profile image path
       }
 
+      // Find and update the user
       const user = await User.findByIdAndUpdate(userId, updatedFields, { new: true, runValidators: true });
       if (!user) {
         throw new Error('User not found!');
       }
+      
+      // Render profile page with updated user
       res.render('pages/profile', { properties, user });
-    } else {
-      res.render('pages/login', { properties, loginError: false });
+    } catch (error) {
+      res.render('pages/404', { error });
     }
-  } catch (error) {
-    res.render('pages/404', { error });
-  }
+  });
 };
 
 exports.deleteUser = async (req, res) => {
@@ -109,14 +119,16 @@ exports.checkEmailAvailability = async (req, res) => {
 exports.showLoginForm = (req, res) => {
   console.log('showLoginForm called');
   try {
+    const redirectUrl = req.query.redirectUrl;
+
     const properties = req.properties;
     if (properties.isLogged) {
       console.log('isLogged true');
 
-      res.render('pages/login', { loginError: false, properties });
+      res.render('pages/login' ,{properties});
     } else {
       console.log('isLogged false');
-      res.render('pages/login', { loginError: false, properties, redirectUrl: req.query.redirectUrl || '/users/profile' });
+      res.render('pages/login', { properties, redirectUrl });
     }
   } catch (error) {
     res.render('pages/404', { error })
@@ -130,32 +142,36 @@ exports.login = async (req, res) => {
     const redirectUrl = req.query.redirectUrl;
     const properties = req.properties;
     if (properties.isLogged) {
-      return res.render('pages/profile');
+      const user = await User.findById(properties.userId);
+      return res.render('pages/profile', { user, properties });
     }
 
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
-      return res.render('pages/login', { user, loginError: true, properties, redirectUrl });
+      return res.render('pages/login', { redirectUrl });
     }
 
     const isPasswordMatch = await bcrypt.compare(password, user.password);
     if (!isPasswordMatch) {
-      return res.render('pages/login', { user, loginError: true, properties, redirectUrl });
+      return res.render('pages/login', {redirectUrl });
     }
 
     const auth_token = jwt.sign({ id: user._id }, 'your_jwt_secret', { expiresIn: '1h' });
     res.cookie('auth_token', auth_token, { httpOnly: true });
 
     if (redirectUrl == '/users/profile') {
-      res.render('pages/profile', { properties });
-      // { user, loginError: false, isLogged:true, userId: "" }
+      console.log('redirectUrl == /users/profile');
+      res.render('pages/profile', { user, properties });
 
     } else {
       res.redirect(redirectUrl)
     }
 
   } catch (error) {
+    if (error.message=='jwt expired') {
+      return res.render('pages/login', { redirectUrl });
+    }
     res.render('pages/404', { error })
 
   }
@@ -175,17 +191,18 @@ exports.logout = (req, res) => {
 exports.getProfile = async (req, res) => {
   console.log('getProfile called');
   try {
-    var userId;
     const properties = req.properties;
 
-    if (properties.isLogged) { userId = properties.userId; }
-    // Find the user by ID (could be req.params.id or userId if authenticated)
-    const user = await User.findById(userId); // Use the userId from token
-    if (!user) throw new Error('User not found!');
-    // Render the profile page and pass both user data and token
-    res.render('pages/profile', { user, properties });
+    if (properties.isLogged) {
+      // Find the user by ID (could be req.params.id or userId if authenticated)
+      const user = await User.findById(properties.userId); // Use the userId from token
+      if (!user) throw new Error('User not found!');
+      res.render('pages/profile', { user, properties });
+    } else {
+      res.render('pages/login');
+    }
   } catch (error) {
-    res.render('pages/404', { error })
+    res.render('pages/404', { error, function: 'getProfile' })
   }
 };
 

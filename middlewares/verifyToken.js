@@ -30,13 +30,21 @@ exports.isLogged = async (req, res, next) => {
             req.isLogged = false;
         } else {
             const decoded = jwt.verify(token, 'your_jwt_secret'); // Use your actual secret
-            console.log('decoded:',decoded);
+            console.log('decoded:', decoded);
             req.user = decoded; // Attach user info to request
             req.isLogged = true;
         }
         next(); // Proceed to the next middleware or route handler
     } catch (error) {
         // If the token is invalid, redirect to the login page
+        if (error.name === 'TokenExpiredError') {
+            // Token has expired
+            console.log('Token has expired');
+            const redirectUrl = req.query.redirectUrl;
+            res.clearCookie('auth_token'); // Clear the authentication token cookie
+            return res.render('pages/login', { redirectUrl });
+        }
+
         res.render('pages/404', { error });
     }
 };
