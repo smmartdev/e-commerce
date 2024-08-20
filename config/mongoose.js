@@ -3,7 +3,8 @@
 const mongoose = require('mongoose');
 
 // Replace with your MongoDB URI
-const mongoURI = 'mongodb://localhost:27017/ecommerce-db';
+// const mongoURI = 'mongodb://localhost:27017/ecommerce-db';
+const mongoURI ='mongodb+srv://smartdev989:63NQtc5fnNurSdR0@cluster0.i1ryl.mongodb.net/ecommerce-db?retryWrites=true&w=majority&appName=Cluster0';
 
 const connectDB = async () => {
   try {
