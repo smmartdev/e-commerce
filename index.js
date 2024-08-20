@@ -31,7 +31,7 @@ const { checkRole } = require('./middlewares/checkRole');
 //test
 
 // Connect to MongoDB
-// connectDB();
+connectDB();
 
 // Set EJS as the view engine
 app.set('view engine', 'ejs');
