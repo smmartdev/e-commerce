@@ -3,17 +3,11 @@
 const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/productController');
-const multer = require('multer');
-const path = require('path');
-const { v4: uuidv4 } = require('uuid');
-const fs = require('fs');
-const User = require('../models/User')
-const Product = require('../models/Product')
-const multerMiddleware = require('../config/multer');
+const multerMiddleware = require('../config/multiMulter');
 
 // Routes for product management
 router.get('/add', productController.showAddProductPage);
-router.post('/add', productController.createProductId, multerMiddleware(),productController.completeAddProduct )
+router.post('/add', productController.createProductId, multerMiddleware(3,'images','images/users'),productController.completeAddProduct )
 router.get('/', productController.getProducts);
 router.get('/:id', productController.getProduct);
 router.put('/:id', productController.updateProduct);

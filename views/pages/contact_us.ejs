@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us</title>
+    <link rel="stylesheet" href="/styles/contact_us.css">
+    <link rel="stylesheet" href="/styles/header.css">
+
+</head>
+
+<body>
+
+    <%- include('../partials/header') %>
+
+
+        <main class="container">
+            <section class="company-info">
+                <h2>Company Information</h2>
+                <p><strong>Company Name:</strong> Your Company Name</p>
+                <p><strong>Address:</strong> 123 Your Street, Your City, Your State, 12345</p>
+                <p><strong>Phone:</strong> (123) 456-7890</p>
+                <p><strong>Email:</strong> <a href="mailto:contact@yourcompany.com">contact@yourcompany.com</a></p>
+            </section>
+
+            <section class="contact-form">
+                <h2>Get in Touch</h2>
+                <form action="/sendUsMessage" method="POST">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required>
+
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+
+                    <label for="message">Message:</label>
+                    <textarea id="message" name="message" rows="4" required></textarea>
+
+                    <button type="submit">Send</button>
+                </form>
+            </section>
+
+            <section class="map">
+                <h2>Our Location</h2>
+                <iframe src="https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=Your+Company+Address"
+                    allowfullscreen>
+                </iframe>
+            </section>
+        </main>
+
+        <footer>
+            <div class="footer-container">
+                <p>&copy; <%= new Date().getFullYear() %> Your Company Name. All rights reserved.</p>
+            </div>
+        </footer>
+</body>
+
+</html>

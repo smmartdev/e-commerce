@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
-const createMulter = require('../config/multer'); // Import the dynamic multer configuration
+const upload = require('../config/profileImageMulter');
 
 // Routes for user management
 
@@ -18,11 +18,8 @@ router.get('/checkEmailAvailability', userController.checkEmailAvailability);
 router.get('/profile/:id', userController.getProfile);
 
 // Use dynamic multer for profile image upload
-router.post('/profile/update', (req, res, next) => {
-  // Configure multer for profile images
-  const multer = createMulter('users'); // Use 'users' path for profile images
-  multer.single('image')(req, res, next); // Use 'image' as the field name
-}, userController.updateProfile);
+router.post('/profile/update', upload.single('profileImage'), userController.updateProfile);
+
 
 router.post('/delete/:userId', userController.deleteUser);
 router.post('/makeSeller/:userId', userController.makeSeller);

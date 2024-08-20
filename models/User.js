@@ -20,9 +20,17 @@ const UserSchema = new Schema({
   address: {
     type: String
   },
+  phone: {
+    type: Number
+  },
+  gender: {
+    type: String,
+    enum: ['male', 'female', 'no-answer'],
+    default: 'no-answer'
+  },
   role: {
     type: String,
-    enum: ['customer', 'admin','seller'],
+    enum: ['customer', 'admin', 'seller'],
     default: 'customer'
   }
 

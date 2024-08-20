@@ -140,21 +140,57 @@ exports.updateProduct = async (req, res) => {
     if (!product) return res.status(404).json({ message: 'Product not found' });
     res.json(product);
   } catch (error) {
-    // res.status(500).json({ error: error.message });
     res.render('pages/404', { error })
-
   }
 };
 
 exports.deleteProduct = async (req, res) => {
   console.log('deleteProduct called');
   try {
-    console.log('req.params.id: ', req.params.id);
-    const product = await Product.findByIdAndDelete(req.params.id);
+    const productId = req.params.id;
+    console.log('req.params.id: ',);
+    const product = await Product.findByIdAndDelete(productId);
     if (!product) throw new Error('Product not found');
-    res.redirect('/products?deleteStatus=ok');
+    // res.redirect('/products?deleteStatus=ok');.
+    const publicDir = path.join(__dirname, '../public');
+    // Usage example: folder to delete relative to the public directory
+    const folderToDelete = path.join(publicDir, `images/products-images/${productId}`); // Change this to the path of the directory you want to delete
+    deleteDirectory(folderToDelete);
+
+    res.status(200).send();
   } catch (error) {
     // res.status(500).json({ error: error.message });
     res.render('pages/404', { error })
+  }
+};
+
+
+const deleteDirectory = async (dirPath) => {
+  console.log('deleteDirectory called');
+
+  try {
+    // Read the contents of the directory
+    const files = await fs.promises.readdir(dirPath);
+
+    // Delete each file and subdirectory
+    for (const file of files) {
+      const filePath = path.join(dirPath, file);
+      const stat = await fs.promises.stat(filePath);
+
+      if (stat.isDirectory()) {
+        // Recursively delete subdirectory
+        await deleteDirectory(filePath);
+      } else {
+        // Delete file
+        await fs.promises.unlink(filePath);
+      }
+    }
+
+    // Delete the now-empty directory
+    await fs.promises.rmdir(dirPath);
+    console.log(`Directory ${dirPath} deleted successfully.`);
+  } catch (error) {
+
+    console.error(`Error deleting directory ${dirPath}:`, error);
   }
 };

@@ -89,106 +89,124 @@
 <body>
   <%- include('../partials/header') %>
 
-  <main>
-    <h1>Welcome to Our Store</h1>
-    <section>
-      <label for="categoryFilter">Category:</label>
-      <select id="categoryFilter">
-        <option value="all">All Categories</option>
-        <!-- Add categories dynamically or hardcode them -->
-        <option value="Electronics">Electronics</option>
-        <option value="Accessories">Accessories</option>
-        <option value="Home Appliances">Home Appliances</option>
-      </select>
+    <main>
+      <h1>Welcome to Our Store</h1>
+      <section>
+        <label for="categoryFilter">Category:</label>
+        <select id="categoryFilter">
+          <option value="all">All Categories</option>
+          <!-- Add categories dynamically or hardcode them -->
 
-      <label for="priceSort">Sort by Price:</label>
-      <select id="priceSort">
-        <option value="asc">Low to High</option>
-        <option value="desc">High to Low</option>
-      </select>
+          <option value="laptops">Laptops & Computers</option>
+          <option value="smart_phones">Smartphones</option>
+          <option value="tablets"> Tablets</option>
+          <option value="cameras">Cameras</option>
+          <option value="audio_headphones">Audio & Headphones</option>
+        </select>
 
-      <div class="product-list" id="productList">
-        <% products.forEach(product => { %>
-          <% if (properties.isSeller) { %>
-            <% if (product.sellerName === properties.userName) { %>
-              <div class="product" data-category="<%= product.category %>" id="product-<%= product._id %>">
-                <img src="images/products-images/<%= product._id %>/img1.jpg" alt="<%= product.name %>" class="product-image">
-                <h3><a href="/products/<%= product._id %>">
-                    <%= product.name %>
-                  </a></h3>
-                <p><%= product.description %></p>
-                <p class="price">Price: $<%= product.price %></p>
-                <div class="buttons">
-                  <a href="/products/<%= product._id %>" class="button details">Details</a>
-                  <button class="button delete" data-product-id="<%= product._id %>">Delete</button>
+
+
+        <label for="priceSort">Sort by Price:</label>
+        <select id="priceSort">
+          <option value="asc">Low to High</option>
+          <option value="desc">High to Low</option>
+        </select>
+
+        <div class="product-list" id="productList">
+          <% products.forEach(product=> { %>
+            <% if (properties.isSeller) { %>
+              <% if (product.sellerName===properties.userName) { %>
+                <div class="product" data-category="<%= product.category %>" id="product-<%= product._id %>">
+                  <img src="images/products-images/<%= product._id %>/img1.jpg" alt="<%= product.name %>"
+                    class="product-image">
+                  <h3><a href="/products/<%= product._id %>">
+                      <%= product.name %>
+                    </a></h3>
+                  <p>
+                    <%= product.description %>
+                  </p>
+                  <p class="price">Price: $<%= product.price %>
+                  </p>
+                  <div class="buttons">
+                    <a href="/products/<%= product._id %>" class="button details">Details</a>
+                    <button class="button delete" data-product-id="<%= product._id %>">Delete</button>
+                  </div>
                 </div>
-              </div>
-            <% } %>
-          <% } else { %>
+                <% } %>
+                  <% } else { %>
 
-            <div class="product" data-category="<%= product.category %>" id="product-<%= product._id %>">
-              <img src="images/products-images/<%= product._id %>/img1.jpg" alt="<%= product.name %>" class="product-image">
-              <h3><a href="/products/<%= product._id %>">
-                  <%= product.name %>
-                </a></h3>
-              <p><%= product.description %></p>
-              <p class="price">Price: $<%= product.price %></p>
-              <div class="buttons">
-                <a href="/products/<%= product._id %>" class="button details">Details</a>
-                <button class="button add-to-cart" data-product-id="<%= product._id %>">Add to Cart</button>
-              </div>
-            </div>
-          <% } %>
-        <% }) %>
-      </div>
-    </section>
-  </main>
+                    <div class="product" data-category="<%= product.category %>" id="product-<%= product._id %>">
+                      <img src="images/products-images/<%= product._id %>/img1.jpg" alt="<%= product.name %>"
+                        class="product-image">
+                      <h3><a href="/products/<%= product._id %>">
+                          <%= product.name %>
+                        </a></h3>
+                      <p>
+                        <%= product.description %>
+                      </p>
+                      <p class="price">Price: $<%= product.price %>
+                      </p>
+                      <p class="seller">Seller: <%= product.sellerName %>
+                      </p>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const categoryFilter = document.getElementById('categoryFilter');
-      const priceSort = document.getElementById('priceSort');
-      const productList = document.getElementById('productList');
-      const cartBadge = document.getElementById('cartBadge');
-      let initialCartCount = 0; // Replace with actual initial count if available
+                      <div class="buttons">
+                        <a href="/products/<%= product._id %>" class="button details">Details</a>
+                        <button class="button add-to-cart" data-product-id="<%= product._id %>">Add to Cart</button>
+                      </div>
+                    </div>
+                    <% } %>
+                      <% }) %>
+        </div>
+      </section>
+    </main>
 
-      function filterProducts() {
-        const selectedCategory = categoryFilter.value;
-        const products = productList.querySelectorAll('.product');
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
 
-        products.forEach(product => {
-          const category = product.getAttribute('data-category');
-          product.style.display = selectedCategory === 'all' || category === selectedCategory ? 'block' : 'none';
+
+        const categoryFilter = document.getElementById('categoryFilter');
+        const priceSort = document.getElementById('priceSort');
+        const productList = document.getElementById('productList');
+        const cartBadge = document.getElementById('cartBadge');
+        let initialCartCount = 0; // Replace with actual initial count if available
+
+        function filterProducts() {
+          const selectedCategory = categoryFilter.value;
+          const products = productList.querySelectorAll('.product');
+
+          products.forEach(product => {
+            const category = product.getAttribute('data-category');
+            product.style.display = selectedCategory === 'all' || category === selectedCategory ? 'block' : 'none';
+          });
+        }
+
+        function sortProducts() {
+          const order = priceSort.value;
+          const products = Array.from(productList.querySelectorAll('.product'));
+
+          products.sort((a, b) => {
+            const priceA = parseFloat(a.querySelector('.price').textContent.replace('Price: $', ''));
+            const priceB = parseFloat(b.querySelector('.price').textContent.replace('Price: $', ''));
+            return order === 'asc' ? priceA - priceB : priceB - priceA;
+          });
+
+          products.forEach(product => productList.appendChild(product));
+        }
+
+        categoryFilter.addEventListener('change', () => {
+          filterProducts();
+          sortProducts();
         });
-      }
 
-      function sortProducts() {
-        const order = priceSort.value;
-        const products = Array.from(productList.querySelectorAll('.product'));
-
-        products.sort((a, b) => {
-          const priceA = parseFloat(a.querySelector('.price').textContent.replace('Price: $', ''));
-          const priceB = parseFloat(b.querySelector('.price').textContent.replace('Price: $', ''));
-          return order === 'asc' ? priceA - priceB : priceB - priceA;
+        priceSort.addEventListener('change', () => {
+          sortProducts();
         });
 
-        products.forEach(product => productList.appendChild(product));
-      }
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+          button.addEventListener('click', async () => {
+            const productId = button.getAttribute('data-product-id');
 
-      categoryFilter.addEventListener('change', () => {
-        filterProducts();
-        sortProducts();
-      });
-
-      priceSort.addEventListener('change', () => {
-        sortProducts();
-      });
-
-      document.querySelectorAll('.add-to-cart').forEach(button => {
-        button.addEventListener('click', async () => {
-          const productId = button.getAttribute('data-product-id');
-
-          if (<%= properties.isLogged %>) {
+            if (<%= properties.isLogged %>) {
             try {
               const response = await fetch(`/cart/add/${productId}`, {
                 method: 'POST',
@@ -223,7 +241,7 @@
           if (confirm('Are you sure you want to delete this product?')) {
             try {
               console.log(productId);
-              
+
               const response = await fetch(`/products/delete/${productId}`, {
                 method: 'DELETE',
                 headers: {
@@ -232,6 +250,8 @@
               });
 
               if (response.ok) {
+                alert('Product deleted successfully');
+
                 document.getElementById(`product-${productId}`).remove();
               } else {
                 alert('Failed to delete the product.');
@@ -251,7 +271,7 @@
         }
       }
     });
-  </script>
+    </script>
 </body>
 
 </html>

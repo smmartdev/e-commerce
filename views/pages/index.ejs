@@ -39,83 +39,86 @@
 
 <body>
 
-<%- include('../partials/header') %>
+  <%- include('../partials/header') %>
 
 
-  <main>
-    <h1>Welcome to Our Store</h1>
-    <section>
-      <div class="product-list">
-        <% products.forEach(product=> { %>
-          <div class="product" id="product-<%= product._id %>">
-            <img src="images/products-images/<%= product._id %>/img1.jpg" alt="<%= product.name %>"
-              class="product-image">
-            <h3><a href="/products/<%= product._id %>">
-                <%= product.name %>
-              </a></h3>
-            <p>
-              <%= product.description %>
-            </p>
-            <p>Price: $<%= product.price %>
-            </p>
-            <div class="buttons">
-              <a href="/products/<%= product._id %>" class="button details">Details</a>
-              <button class="button add-to-cart" data-product-id="<%= product._id %>">Add to Cart</button>
+    <main>
+      <h1>Welcome to Our Store</h1>
+      <section>
+        <div class="product-list">
+          <% products.forEach(product=> { %>
+            <div class="product" id="product-<%= product._id %>">
+              <img src="images/products-images/<%= product._id %>/img1.jpg" alt="<%= product.name %>"
+                class="product-image">
+              <h3><a href="/products/<%= product._id %>">
+                  <%= product.name %>
+                </a></h3>
+              <p>
+                <%= product.description %>
+              </p>
+              <p>Price: $<%= product.price %>
+                  <p class="seller">Seller: <%= product.sellerName %>
+                  </p>
+
+              </p>
+              <div class="buttons">
+                <a href="/products/<%= product._id %>" class="button details">Details</a>
+                <button class="button add-to-cart" data-product-id="<%= product._id %>">Add to Cart</button>
+              </div>
             </div>
-          </div>
-          <% }) %>
-      </div>
-    </section>
-  </main>
+            <% }) %>
+        </div>
+      </section>
+    </main>
 
-  <script>
-    const cartBadge = document.getElementById('cartBadge');
-    let initialCartCount = 0; // Replace with actual initial count if available
+    <script>
+      const cartBadge = document.getElementById('cartBadge');
+      let initialCartCount = 0; // Replace with actual initial count if available
 
-    document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener('DOMContentLoaded', () => {
 
-    });
+      });
 
-    document.querySelectorAll('.add-to-cart').forEach(button => {
-      button.addEventListener('click', async () => {
-        console.log('Add to cart button clicked');
-        const productId = button.getAttribute('data-product-id');
+      document.querySelectorAll('.add-to-cart').forEach(button => {
+        button.addEventListener('click', async () => {
+          console.log('Add to cart button clicked');
+          const productId = button.getAttribute('data-product-id');
 
-        if (<%= properties.isLogged %>) {
-        try {
-          const response = await fetch(`/cart/add/${productId}`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
+          if (<%= properties.isLogged %>) {
+          try {
+            const response = await fetch(`/cart/add/${productId}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              }
+            });
+
+            if (response.ok) {
+              // Update cart badge
+              let count = parseInt(cartBadge.textContent) || initialCartCount;
+              count += 1;
+              updateCartBadge(count);
+              initialCartCount = count; // Update the initial count for further additions
+            } else {
+              alert('Failed to add product to cart.');
             }
-          });
-
-          if (response.ok) {
-            // Update cart badge
-            let count = parseInt(cartBadge.textContent) || initialCartCount;
-            count += 1;
-            updateCartBadge(count);
-            initialCartCount = count; // Update the initial count for further additions
-          } else {
-            alert('Failed to add product to cart.');
+          } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while adding the product to the cart.');
           }
-        } catch (error) {
-          console.error('Error:', error);
-          alert('An error occurred while adding the product to the cart.');
+        } else {
+          // Redirect to login page with the current URL as a query parameter
+          window.location.href = `/users/login?redirectUrl=${window.location.href}`;
         }
-      } else {
-        // Redirect to login page with the current URL as a query parameter
-        window.location.href = `/users/login?redirectUrl=${window.location.href}`;
-      }
-    });});
+      });});
 
-    function updateCartBadge(count) {
-      if (count > 0) {
-        cartBadge.textContent = count;
-        cartBadge.style.visibility = 'visible';
+      function updateCartBadge(count) {
+        if (count > 0) {
+          cartBadge.textContent = count;
+          cartBadge.style.visibility = 'visible';
+        }
       }
-    }
-  </script>
+    </script>
 </body>
 
 </html>

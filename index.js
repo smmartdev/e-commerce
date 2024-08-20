@@ -23,6 +23,8 @@ const path = require('path');
 
 
 const Product = require('./models/Product');
+const Message = require('./models/Message');
+
 const { isLogged } = require('./middlewares/verifyToken');
 const { checkRole } = require('./middlewares/checkRole');
 
@@ -56,19 +58,39 @@ app.use('/cart', cartRoutes);
 // Serve home page
 app.get('/', async (req, res) => {
   console.log('home page called');
-
   try {
     const products = await Product.find();
     const properties = req.properties;
-    if (properties.isLogged) {
-      console.log('isLogged true');
-      res.render('pages/index', { products, properties });
-    } else {
-      console.log('isLogged false');
-      res.render('pages/index', { products, properties });
-    }
+    res.render('pages/index', { products, properties });
+  } catch (error) {
+    console.log('error', error.message);
+    res.render('pages/404', { error });
+  }
+});
+
+app.get('/contactUs', async (req, res) => {
+  console.log('contactUs page called');
+  try {
+    const properties = req.properties;
+
+    res.render('pages/contact_us', { properties });
+
   } catch (error) {
     // If the token is invalid, redirect to the login page
+    console.log('error', error.message);
+    res.render('pages/404', { error });
+  }
+});
+
+app.post('/sendUsMessage', async (req, res) => {
+  console.log('contactUs page called');
+  try {
+    const { name, email, message } = req.body
+    const newMessage = new Message({ name, email, message });
+    await newMessage.save();
+    res.redirect('/contactUs')
+    if (!newMessage) throw new Error('Failed to save you message. please try again')
+  } catch (error) {
     console.log('error', error.message);
     res.render('pages/404', { error });
   }

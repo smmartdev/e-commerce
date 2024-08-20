@@ -28,6 +28,8 @@
       <!-- Form to edit profile and upload a new image -->
       <div class="edit-profile-form">
         <form action="/users/profile/update" method="POST" enctype="multipart/form-data">
+          <input type="hidden" id="userId" name="userId" value="<%= user._id %>" required>
+
           <label for="name">Name:</label>
           <input type="text" id="name" name="name" value="<%= user.name %>" required>
 
@@ -37,10 +39,19 @@
           <label for="address">Address:</label>
           <input type="text" id="address" name="address" value="<%= user.address %>" required>
 
+          <label for="phone">Phone:</label>
+          <input type="text" id="phone" name="phone" value="<%= user.phone %>" >
+
+          <label for="gender">Gender:</label>
+          <select id="gender" name="gender">
+            <option value="male" <%= user.gender === 'male' ? 'selected' : '' %>>Male</option>
+            <option value="female" <%= user.gender === 'female' ? 'selected' : '' %>>Female</option>
+            <option value="no-answer" <%= user.gender === 'no-answer' ? 'selected' : '' %>>No Answer</option>
+        </select>
+<br><br>
           <label for="profileImage">Profile Image:</label>
           <input type="file" id="editProfileImage" name="profileImage" accept="image/*">
 
-          <input type="hidden" id="userId" name="userId" value="<%= user._id %>" required>
 
           <button type="submit">Update Profile</button>
         </form>
