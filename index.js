@@ -1,18 +1,6 @@
-// app.js
 const express = require('express');
 const app = express();
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-// Middleware to parse JSON bodies
-// app.use(bodyParser.json());
-// Middleware to parse URL-encoded bodies
-// app.use(bodyParser.urlencoded({ extended: true }));
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
-
-
-const connectDB = require('./config/mongoose');
+const { connectDB, mongooseConnection } = require('./config/mongoose'); // Import your DB config
 const userRoutes = require('./routes/userRoutes');
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
@@ -20,40 +8,53 @@ const paymentRoutes = require('./routes/paymentRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const jwt = require('jsonwebtoken');
 const path = require('path');
-
-
+require('dotenv').config();
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const Product = require('./models/Product');
 const Message = require('./models/Message');
-
 const { isLogged } = require('./middlewares/verifyToken');
 const { checkRole } = require('./middlewares/checkRole');
+const cookieParser = require('cookie-parser');
+const port = process.env.PORT || 3000
+const mongoUrl = process.env.MONGOURL;
+const sessionTime=+process.env.SESSION_TIME;
+const sessionSecretKey=process.env.SESSION_SECRET_KEY;
 
-//test
+console.log({sessionTime});
+console.log('typeof', typeof sessionTime);
 
-// Connect to MongoDB
+
 connectDB();
 
 // Set EJS as the view engine
 app.set('view engine', 'ejs');
 
-
-
+// Middleware
+app.use(express.static('public'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
-
-
-
-
-// Routes
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(session({
+  secret: sessionSecretKey, // Replace with a strong secret key
+  resave: false,
+  saveUninitialized: false,
+  store: new MongoStore({
+    mongoUrl: mongoUrl,
+    mongooseConnection: mongooseConnection // Use the mongoose connection
+  }),
+  cookie: { secure: false, maxAge: sessionTime } 
+}));
 app.use(isLogged);
 app.use(checkRole);
 
+// Routes
 app.use('/users', userRoutes);
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
 app.use('/payment', paymentRoutes);
 app.use('/cart', cartRoutes);
-
 
 // Serve home page
 app.get('/', async (req, res) => {
@@ -68,13 +69,12 @@ app.get('/', async (req, res) => {
   }
 });
 
+// Serve contactUs page
 app.get('/contactUs', async (req, res) => {
   console.log('contactUs page called');
   try {
     const properties = req.properties;
-
     res.render('pages/contact_us', { properties });
-
   } catch (error) {
     // If the token is invalid, redirect to the login page
     console.log('error', error.message);
@@ -82,6 +82,7 @@ app.get('/contactUs', async (req, res) => {
   }
 });
 
+// Serve sendUsMessage page
 app.post('/sendUsMessage', async (req, res) => {
   console.log('contactUs page called');
   try {
@@ -96,6 +97,6 @@ app.post('/sendUsMessage', async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
