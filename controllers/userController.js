@@ -46,7 +46,7 @@
 //     // Extract user profile data from the request body
 //     const { userId, name, address, phone, gender } = req.body;
 //       console.log({gender});
-      
+
 //       if(!userId){throw new Error('userId is required for updating profile');}
 //     // Extract file information from the request
 //     const updateUser = await User.findOneAndUpdate({ _id: userId }, { name, address, phone, gender })
@@ -244,11 +244,29 @@ exports.register = async (req, res) => {
   console.log('register called');
   try {
     const { name, email, address, phone, gender, password } = req.body;
+
+    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create new user
     const user = new User({ name, email, password: hashedPassword, address, phone, gender });
     await user.save();
-    req.flash('success_msg', 'Registration successful. Please log in.');
-    res.redirect('/users/login');
+
+    // Log the user in by storing their ID in the session
+    // req.session.user = user; // Store the entire user object or just user._id
+    // console.log('user id', user._id);
+    // req.properties.isLogged = true;
+    // req.flash('success_msg', 'Registration successful. Welcome!');
+    // res.render('pages/profile', { user, properties: req.properties || {} });
+
+    req.session.userId = user._id;
+    req.properties = {
+      isLogged: true,
+      isAdmin: user.role === 'admin', // Assuming user.role indicates admin status
+    };
+
+    const redirectUrl = req.query.redirectUrl || '/';
+    res.redirect(redirectUrl);
   } catch (error) {
     console.error(error);
     req.flash('error_msg', 'Registration failed. Please try again.');
@@ -347,23 +365,24 @@ exports.login = async (req, res) => {
 
 exports.logout = (req, res) => {
   console.log('logout called');
-  try {
-    req.session.destroy((err) => {
-      if (err) {
-        console.error(err);
-        req.flash('error_msg', 'Error logging out.');
-        return res.redirect('/');
-      }
-      res.clearCookie('connect.sid'); // Clear the session cookie
-      req.flash('success_msg', 'Logged out successfully.');
-      res.redirect('/users/login');
-    });
-  } catch (error) {
-    console.error(error);
-    req.flash('error_msg', 'Logout failed.');
-    res.redirect('/');
-  }
+
+  // Store flash messages before destroying the session
+  req.flash('success_msg', 'Logged out successfully.');
+
+  req.session.destroy((err) => {
+    if (err) {
+      console.error(err);
+      req.flash('error_msg', 'Error logging out.');
+      return res.redirect('/');
+    }
+
+    res.clearCookie('connect.sid'); // Clear the session cookie
+
+    // Redirect after session is destroyed
+    res.redirect('/users/login');
+  });
 };
+
 
 exports.getProfile = async (req, res) => {
   console.log('getProfile called');

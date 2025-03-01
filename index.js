@@ -1,3 +1,7 @@
+
+
+
+
 const express = require('express');
 const app = express();
 const { connectDB, mongooseConnection } = require('./config/mongoose'); // Import your DB config
@@ -10,6 +14,7 @@ const jwt = require('jsonwebtoken');
 const path = require('path');
 require('dotenv').config();
 const session = require('express-session');
+const flash = require('connect-flash');
 const MongoStore = require('connect-mongo');
 const Product = require('./models/Product');
 const Message = require('./models/Message');
@@ -48,6 +53,13 @@ app.use(session({
 }));
 app.use(isLogged);
 app.use(checkRole);
+app.use(session({
+  secret: 'your_secret_key',
+  resave: false,
+  saveUninitialized: true
+}));
+
+app.use(flash());
 
 // Routes
 app.use('/users', userRoutes);
@@ -55,7 +67,7 @@ app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
 app.use('/payment', paymentRoutes);
 app.use('/cart', cartRoutes);
-
+//
 // Serve home page
 app.get('/', async (req, res) => {
   console.log('home page called');

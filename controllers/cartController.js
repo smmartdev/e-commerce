@@ -9,7 +9,7 @@ exports.viewCart = async (req, res) => {
   try {
     const properties = req.properties;
     let cart = await Cart.findOne({ userId: req.user.id });
-    res.render('pages/cart', { cart:cart||{items:[]}, properties});
+    res.render('pages/cart', { cart: cart || { items: [] }, properties });
   } catch (error) {
     res.render('pages/404', { error })
   }
@@ -21,6 +21,8 @@ const updateTotalPrice = (cart) => {
   cart.totalPrice = cart.items.reduce((total, item) => total + (item.quantity * item.price), 0);
 };
 
+
+
 exports.addToCart = async (req, res) => {
   console.log('addToCart called');
   try {
@@ -29,7 +31,7 @@ exports.addToCart = async (req, res) => {
     const quantity = req.body.quantity || 1;
     const userId = properties.userId;
     console.log({userId});
-    
+
     // Fetch the product
     let product = await Product.findOne({ _id: productId });
     if (!product) {
@@ -65,7 +67,6 @@ exports.addToCart = async (req, res) => {
       await cart.save();
     }
     res.render('pages/cart', { cart:cart||{items:[]}, properties});
-
     // res.status(200).send({ msg: 'Item added successfully' });
   } catch (error) {
     console.error('Error adding to cart:', error);
